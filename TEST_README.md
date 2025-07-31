@@ -46,10 +46,7 @@ python -m pytest test_main.py::TestStatsEndpoint::test_stats_endpoint -v
 ### Expected Values
 The tests verify specific values based on the mock data:
 - **Health**: 4 posts, 28 likes, 22 shares, 29 comments
-- **Finance**: 7 posts, 294 likes, 96 shares, 9 comments  
-- **News**: 8 posts, 204 likes, 88 shares, 24 comments
-- **Sports**: 5 posts, 55 likes, 77 shares, 39 comments
-- **Tech**: 6 posts, 114 likes, 81 shares, 26 comments
+
 
 ### Key Features Tested
 - ✅ Fresh database bootstrap for each test
