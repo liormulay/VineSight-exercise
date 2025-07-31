@@ -89,10 +89,34 @@ The application will start on `http://localhost:8000` and automatically load moc
 
 ## Testing
 
-Run tests with:
+The project includes comprehensive integration tests that validate the application with fresh databases and mock data.
+
+### Quick Test Run
 ```bash
 pytest
 ```
+
+### Recommended Test Run (with detailed output)
+```bash
+python run_tests.py
+```
+
+### Alternative Test Options
+```bash
+# Run specific integration test with verbose output
+python -m pytest tests/test_integration.py::TestIntegration::test_stats_endpoint_with_mock_data -v -s
+
+# Run all tests with verbose output
+python -m pytest tests/ -v
+```
+
+### What the Tests Validate
+- **Response Structure**: HTTP 200 status, proper JSON structure
+- **Data Integrity**: All expected topics present with valid numeric values
+- **Mock Data Processing**: Fresh database creation and CSV data loading
+- **Endpoint Functionality**: Complete `/stats` endpoint validation
+
+For detailed test documentation, see `TEST_README.md`.
 
 ## Architecture Principles Applied
 

@@ -115,10 +115,6 @@ Inserting data into database...
 Successfully loaded 50 records into database
 
 Actual response values:
-news: 8 posts, likes: 204, shares: 88, comments: 24
-finance: 7 posts, likes: 294, shares: 96, comments: 9
 health: 4 posts, likes: 28, shares: 22, comments: 29
-sports: 5 posts, likes: 55, shares: 77, comments: 39
-tech: 6 posts, likes: 114, shares: 81, comments: 26
 PASSED
 ``` 
