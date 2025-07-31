@@ -1,65 +1,124 @@
-# Automated Tests for VineSight Exercise
+# Automated Integration Test
 
-This directory contains automated tests for the VineSight Exercise FastAPI application.
+This directory contains an automated integration test that validates the `/stats` endpoint functionality with a fresh database and mock data.
 
 ## Test Overview
 
-The test suite includes:
+The test performs the following steps:
 
-1. **TestStatsEndpoint.test_stats_endpoint**: Tests the `/stats` endpoint
-   - Bootstraps a fresh test database
-   - Loads mock data from `mock_posts.csv`
-   - Sends a request to `/stats`
-   - Verifies the response structure and specific values
+1. **Bootstraps a fresh database** - Creates a temporary SQLite database for testing
+2. **Loads mock data** - Imports data from `mock_posts.csv` into the database
+3. **Sends a request** - Makes a GET request to the `/stats` endpoint
+4. **Verifies the response** - Validates the response structure and specific values
 
-2. **test_mock_data_loading**: Tests mock data loading functionality
-   - Verifies that mock data can be loaded correctly
-   - Checks data integrity (total rows, unique post IDs, topics)
+## Files
 
-## Running the Tests
+- `tests/test_integration.py` - The main integration test
+- `run_tests.py` - Simple test runner script
+- `pytest.ini` - Pytest configuration
+- `mock_posts.csv` - Mock data used by the test
 
-### Prerequisites
-Make sure you have all dependencies installed:
+## Running the Test
+
+### Option 1: Using the test runner script
 ```bash
-pip install -r requirements.txt
+python run_tests.py
 ```
 
-### Run Tests
+### Option 2: Using pytest directly
 ```bash
+# Run the specific test
+python -m pytest tests/test_integration.py::TestIntegration::test_stats_endpoint_with_mock_data -v
+
 # Run all tests
-python -m pytest test_main.py -v
+python -m pytest tests/ -v
+```
 
-# Run with verbose output
-python -m pytest test_main.py -v -s
-
-# Run a specific test
-python -m pytest test_main.py::TestStatsEndpoint::test_stats_endpoint -v
+### Option 3: Using pytest with more output
+```bash
+python -m pytest tests/test_integration.py::TestIntegration::test_stats_endpoint_with_mock_data -v -s
 ```
 
 ## Test Details
 
-### Database Setup
-- Each test creates a fresh SQLite database
-- Mock data is loaded from `mock_posts.csv`
-- Database connections are properly cleaned up after each test
+### What the test validates:
 
-### Expected Values
-The tests verify specific values based on the mock data:
-- **Health**: 4 posts, 28 likes, 22 shares, 29 comments
+1. **Response Structure**
+   - Returns HTTP 200 status
+   - Contains a `topics` array
+   - Each topic has `topic`, `posts_count`, `total_likes`, `total_shares`, `total_comments` fields
 
+2. **Data Integrity**
+   - All expected topics are present (health, finance, news, sports, tech)
+   - All numeric values are non-negative
+   - Post counts are positive and reasonable
 
-### Key Features Tested
-- ✅ Fresh database bootstrap for each test
-- ✅ Mock data loading from CSV
-- ✅ HTTP request to `/stats` endpoint
-- ✅ Response structure validation
-- ✅ Specific value assertions
-- ✅ Proper cleanup of test resources
+3. **Specific Values** (based on mock data)
+   - **Health**: 4 posts, 28 likes, 22 shares, 29 comments
+   - Other topics are validated for structure but not specific values
 
-## Test Data
-The tests use the provided `mock_posts.csv` file which contains:
-- 50 total rows
-- 18 unique post IDs
-- 5 topics: health, finance, news, sports, tech
-- Multiple versions of posts (only latest versions are considered in stats)
-- Missing data represented as -1 (excluded from calculations) 
+### Test Features:
+
+- **Isolated Database**: Uses a temporary database file that's cleaned up after the test
+- **Fresh Data**: Clears existing data and loads fresh mock data for each test run
+- **Error Handling**: Gracefully handles file cleanup on Windows
+- **Detailed Output**: Shows actual response values for debugging
+
+## Mock Data
+
+The test uses `mock_posts.csv` which contains 50 records with the following structure:
+- `post_id`: Unique post identifier
+- `topic`: Category (health, finance, news, sports, tech)
+- `likes`, `shares`, `comments`: Engagement metrics (some values are -1 indicating missing data)
+- `version`: Post version number
+- `timestamp`: When the post was created
+
+## Dependencies
+
+The test requires the following packages (already in `requirements.txt`):
+- `pytest` - Test framework
+- `pytest-asyncio` - Async test support
+- `httpx` - HTTP client for testing
+- `fastapi` - Web framework
+- `sqlalchemy` - Database ORM
+- `pandas` - CSV data processing
+
+## Troubleshooting
+
+### Common Issues:
+
+1. **Permission Error**: The test creates temporary files. If you see permission errors, the test will continue and clean up on the next run.
+
+2. **Database Lock**: If the database is locked, the test will retry or skip cleanup.
+
+3. **Import Errors**: Make sure all dependencies are installed:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Debugging:
+
+To see detailed output including the actual response values:
+```bash
+python -m pytest tests/test_integration.py::TestIntegration::test_stats_endpoint_with_mock_data -v -s
+```
+
+## Expected Output
+
+When the test passes, you should see output similar to:
+```
+Loading data from /tmp/temp.csv...
+Clearing existing data...
+Reading CSV file...
+Found 50 records to process
+Inserting data into database...
+Successfully loaded 50 records into database
+
+Actual response values:
+news: 8 posts, likes: 204, shares: 88, comments: 24
+finance: 7 posts, likes: 294, shares: 96, comments: 9
+health: 4 posts, likes: 28, shares: 22, comments: 29
+sports: 5 posts, likes: 55, shares: 77, comments: 39
+tech: 6 posts, likes: 114, shares: 81, comments: 26
+PASSED
+``` 
